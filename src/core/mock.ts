@@ -6,27 +6,26 @@ import { IMock } from './mock.interface';
 
 let GLOBAL_INVOCATION_NO = 0;
 
-type InvocationCounter = {
-    value: number;
-};
-
-function createMethodInfo(type: MockedInfoType, data: IInvocationData[], counter: InvocationCounter): IMockedMethodInfo {
+function createMethodInfo(type: MockedInfoType, data: IInvocationData[]): IMockedMethodInfo {
     return Object.freeze({
         type: type,
         get count(): number {
-            return counter.value;
+            return data.length;
         },
         getData(no: number): IInvocationData | null {
             return data[no] || null;
+        },
+        clear(): void {
+            data.splice(0, data.length);
         }
     });
 }
 
-function createFunctionMock(func: Function, subject: any, data: IInvocationData[], counter: InvocationCounter): Function {
+function createFunctionMock(func: Function, subject: any, data: IInvocationData[]): Function {
     return function() {
         const result = func.bind(subject)(...arguments);
         data.push(Object.freeze({
-            no: counter.value++,
+            no: data.length,
             globalNo: GLOBAL_INVOCATION_NO++,
             timestamp: new Date().valueOf(),
             result: Object.freeze(result),
@@ -41,9 +40,8 @@ function createMethodMock(
     subject: any, func: Function, name: string): Function {
 
     const data: IInvocationData[] = [];
-    const counter: InvocationCounter = { value: 0 };
-    invocationCache[name] = createMethodInfo(MockedInfoType.Method, data, counter);
-    return createFunctionMock(func, subject, data, counter);
+    invocationCache[name] = createMethodInfo(MockedInfoType.Method, data);
+    return createFunctionMock(func, subject, data);
 }
 
 function createPropertyMock(
@@ -58,15 +56,13 @@ function createPropertyMock(
     const result: { getter?(): any; setter?(value: any): void } = {};
     if (prop.get) {
         const data: IInvocationData[] = [];
-        const counter: InvocationCounter = { value: 0 };
-        info.get = createMethodInfo(MockedInfoType.PropertyGetter, data, counter);
-        result.getter = createFunctionMock(prop.get, subject, data, counter) as () => any;
+        info.get = createMethodInfo(MockedInfoType.PropertyGetter, data);
+        result.getter = createFunctionMock(prop.get, subject, data) as () => any;
     }
     if (prop.set) {
         const data: IInvocationData[] = [];
-        const counter: InvocationCounter = { value: 0 };
-        info.set = createMethodInfo(MockedInfoType.PropertySetter, data, counter);
-        result.setter = createFunctionMock(prop.set, subject, data, counter) as (value: any) => void;
+        info.set = createMethodInfo(MockedInfoType.PropertySetter, data);
+        result.setter = createFunctionMock(prop.set, subject, data) as (value: any) => void;
     }
     invocationCache[name] = Object.freeze(info);
     return result;
@@ -109,4 +105,9 @@ export function mock<T>(setup: Partial<T>): IMock<T> {
 /** Resets global mock invocation no counter. */
 export function resetGlobalMockInvocationNo(): void {
     GLOBAL_INVOCATION_NO = 0;
+}
+
+/** Returns current global invocation bo counter. */
+export function getGlobalMockInvocationNo(): number {
+    return GLOBAL_INVOCATION_NO;
 }
