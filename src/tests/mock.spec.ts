@@ -2,7 +2,7 @@ import { MockedInfoType } from '../core/mocked-info-type.enum';
 import { IMockedMethodInfo } from '../core/mocked-method-info.interface';
 import { IMockedPropertyInfo } from '../core/mocked-property-info.interface';
 import { IMock } from '../core/mock.interface';
-import { mock, resetGlobalMockInvocationNo } from '../core/mock';
+import { mock, resetGlobalMockInvocationNo, getGlobalMockInvocationNo } from '../core/mock';
 
 abstract class Test {
     public abstract field: string;
@@ -488,6 +488,21 @@ test('data global no should increment properly',
         expect(readonlyPropertyInfo.get!.getData(0)!.globalNo).toBe(2);
         expect(voidMethodInfo.getData(0)!.globalNo).toBe(1);
         expect(returningMethodInfo.getData(0)!.globalNo).toBe(3);
+        expect(getGlobalMockInvocationNo()).toBe(4);
+    }
+);
+
+test('mocked method info clear should remove all invocation data',
+    () => {
+        const sut = mock<Test>({
+            set property(value: number) { return; }
+        });
+        const info = sut.getMemberInfo('property') as IMockedPropertyInfo;
+        sut.subject.property = 0;
+        sut.subject.property = 1;
+        sut.subject.property = 2;
+        info.set!.clear();
+        expect(info.set!.count).toBe(0);
     }
 );
 

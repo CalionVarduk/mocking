@@ -13,4 +13,6 @@ export interface IMockedMethodInfo {
      * @returns invocation data
      * */
     getData(invocationNo: number): IInvocationData | null;
+    /** Clears all stored invocation data. */
+    clear(): void;
 }
