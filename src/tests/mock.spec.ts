@@ -1,7 +1,8 @@
-import { mock } from '../core/mock';
+import { MockedInfoType } from '../core/mocked-info-type.enum';
+import { IMockedMethodInfo } from '../core/mocked-method-info.interface';
+import { IMockedPropertyInfo } from '../core/mocked-property-info.interface';
 import { IMock } from '../core/mock.interface';
-import { InvocationInfoType } from '../core/invocation-info-type.enum';
-import { IPropertyInvocationInfo, IInvocationInfo } from '../core/invocation-info.interface';
+import { mock, resetGlobalMockInvocationNo } from '../core/mock';
 
 abstract class Test {
     public abstract field: string;
@@ -22,6 +23,8 @@ function assert(sut: IMock<Test>, expectedMemberCount: number): void {
     expect(sut.mockedMembers.length).toBe(expectedMemberCount);
 }
 
+beforeEach(() => resetGlobalMockInvocationNo());
+
 test('mock function should create a valid mock object',
     () => {
         const sut = mock<Test>({});
@@ -38,7 +41,7 @@ test('mock function should create a valid mock object with field only',
         });
         assert(sut, 1);
         expect(sut.mockedMembers).toContain('field');
-        expect(sut.getInvocationInfo('field')).not.toBeDefined();
+        expect(sut.getMemberInfo('field')).toBeNull();
         expect(sut.subject.field).toBe(expected);
     }
 );
@@ -50,15 +53,15 @@ test('mock function should create a valid mock object with property getter only'
         const sut = mock<Test>({
             get readonlyProperty() { return expected; }
         });
-        const info = sut.getInvocationInfo('readonlyProperty') as IPropertyInvocationInfo;
+        const info = sut.getMemberInfo('readonlyProperty') as IMockedPropertyInfo;
         assert(sut, 1);
         expect(sut.mockedMembers).toContain('readonlyProperty');
         expect(info).toBeDefined();
         expect(info).not.toBeNull();
-        expect(info.type).toBe(InvocationInfoType.Property);
+        expect(info.type).toBe(MockedInfoType.Property);
         expect(info.get).toBeDefined();
         expect(info.get).not.toBeNull();
-        expect(info.get!.type).toBe(InvocationInfoType.PropertyGetter);
+        expect(info.get!.type).toBe(MockedInfoType.PropertyGetter);
         expect(info.get!.count).toBe(0);
         expect(info.set).toBeNull();
         expect(sut.subject.readonlyProperty).toBe(expected);
@@ -73,16 +76,16 @@ test('mock function should create a valid mock object with property setter only'
         const sut = mock<Test>({
             set property(value: number) { result = value; }
         });
-        const info = sut.getInvocationInfo('property') as IPropertyInvocationInfo;
+        const info = sut.getMemberInfo('property') as IMockedPropertyInfo;
         assert(sut, 1);
         expect(sut.mockedMembers).toContain('property');
         expect(info).toBeDefined();
         expect(info).not.toBeNull();
-        expect(info.type).toBe(InvocationInfoType.Property);
+        expect(info.type).toBe(MockedInfoType.Property);
         expect(info.get).toBeNull();
         expect(info.set).toBeDefined();
         expect(info.set).not.toBeNull();
-        expect(info.set!.type).toBe(InvocationInfoType.PropertySetter);
+        expect(info.set!.type).toBe(MockedInfoType.PropertySetter);
         expect(info.set!.count).toBe(0);
         sut.subject.property = expected;
         expect(result).toBe(expected);
@@ -98,19 +101,19 @@ test('mock function should create a valid mock object with property only',
             get property(): number { return result; },
             set property(value: number) { result = value; }
         });
-        const info = sut.getInvocationInfo('property') as IPropertyInvocationInfo;
+        const info = sut.getMemberInfo('property') as IMockedPropertyInfo;
         assert(sut, 1);
         expect(sut.mockedMembers).toContain('property');
         expect(info).toBeDefined();
         expect(info).not.toBeNull();
-        expect(info.type).toBe(InvocationInfoType.Property);
+        expect(info.type).toBe(MockedInfoType.Property);
         expect(info.get).toBeDefined();
         expect(info.get).not.toBeNull();
-        expect(info.get!.type).toBe(InvocationInfoType.PropertyGetter);
+        expect(info.get!.type).toBe(MockedInfoType.PropertyGetter);
         expect(info.get!.count).toBe(0);
         expect(info.set).toBeDefined();
         expect(info.set).not.toBeNull();
-        expect(info.set!.type).toBe(InvocationInfoType.PropertySetter);
+        expect(info.set!.type).toBe(MockedInfoType.PropertySetter);
         expect(info.set!.count).toBe(0);
         sut.subject.property = expected;
         expect(sut.subject.property).toBe(expected);
@@ -133,12 +136,12 @@ test('mock function should create a valid mock object with method only',
                 return { x: a1!, y: a1! * 2 };
             }
         });
-        const info = sut.getInvocationInfo('returningMethod') as IInvocationInfo;
+        const info = sut.getMemberInfo('returningMethod') as IMockedMethodInfo;
         assert(sut, 1);
         expect(sut.mockedMembers).toContain('returningMethod');
         expect(info).toBeDefined();
         expect(info).not.toBeNull();
-        expect(info.type).toBe(InvocationInfoType.Method);
+        expect(info.type).toBe(MockedInfoType.Method);
         expect(info.count).toBe(0);
         expect(sut.subject.returningMethod(expected1, expected2)).toStrictEqual(expectedResult);
         expect(result1).toBe(expected1);
@@ -172,43 +175,43 @@ test('mock function should create a valid mock object with all members',
                 return { x: a1!, y: a1! * 2 };
             }
         });
-        const propertyInfo = sut.getInvocationInfo('property') as IPropertyInvocationInfo;
-        const readonlyPropertyInfo = sut.getInvocationInfo('readonlyProperty') as IPropertyInvocationInfo;
-        const voidMethodInfo = sut.getInvocationInfo('voidMethod') as IInvocationInfo;
-        const returningMethodInfo = sut.getInvocationInfo('returningMethod') as IInvocationInfo;
+        const propertyInfo = sut.getMemberInfo('property') as IMockedPropertyInfo;
+        const readonlyPropertyInfo = sut.getMemberInfo('readonlyProperty') as IMockedPropertyInfo;
+        const voidMethodInfo = sut.getMemberInfo('voidMethod') as IMockedMethodInfo;
+        const returningMethodInfo = sut.getMemberInfo('returningMethod') as IMockedMethodInfo;
         assert(sut, 5);
         expect(sut.mockedMembers).toContain('field');
         expect(sut.mockedMembers).toContain('property');
         expect(sut.mockedMembers).toContain('readonlyProperty');
         expect(sut.mockedMembers).toContain('voidMethod');
         expect(sut.mockedMembers).toContain('returningMethod');
-        expect(sut.getInvocationInfo('field')).not.toBeDefined();
+        expect(sut.getMemberInfo('field')).toBeNull();
         expect(propertyInfo).toBeDefined();
         expect(propertyInfo).not.toBeNull();
-        expect(propertyInfo.type).toBe(InvocationInfoType.Property);
+        expect(propertyInfo.type).toBe(MockedInfoType.Property);
         expect(propertyInfo.get).toBeDefined();
         expect(propertyInfo.get).not.toBeNull();
-        expect(propertyInfo.get!.type).toBe(InvocationInfoType.PropertyGetter);
+        expect(propertyInfo.get!.type).toBe(MockedInfoType.PropertyGetter);
         expect(propertyInfo.get!.count).toBe(0);
         expect(propertyInfo.set).toBeDefined();
         expect(propertyInfo.set).not.toBeNull();
-        expect(propertyInfo.set!.type).toBe(InvocationInfoType.PropertySetter);
+        expect(propertyInfo.set!.type).toBe(MockedInfoType.PropertySetter);
         expect(propertyInfo.set!.count).toBe(0);
         expect(readonlyPropertyInfo).toBeDefined();
         expect(readonlyPropertyInfo).not.toBeNull();
-        expect(readonlyPropertyInfo.type).toBe(InvocationInfoType.Property);
+        expect(readonlyPropertyInfo.type).toBe(MockedInfoType.Property);
         expect(readonlyPropertyInfo.get).toBeDefined();
         expect(readonlyPropertyInfo.get).not.toBeNull();
-        expect(readonlyPropertyInfo.get!.type).toBe(InvocationInfoType.PropertyGetter);
+        expect(readonlyPropertyInfo.get!.type).toBe(MockedInfoType.PropertyGetter);
         expect(readonlyPropertyInfo.get!.count).toBe(0);
         expect(readonlyPropertyInfo.set).toBeNull();
         expect(voidMethodInfo).toBeDefined();
         expect(voidMethodInfo).not.toBeNull();
-        expect(voidMethodInfo.type).toBe(InvocationInfoType.Method);
+        expect(voidMethodInfo.type).toBe(MockedInfoType.Method);
         expect(voidMethodInfo.count).toBe(0);
         expect(returningMethodInfo).toBeDefined();
         expect(returningMethodInfo).not.toBeNull();
-        expect(returningMethodInfo.type).toBe(InvocationInfoType.Method);
+        expect(returningMethodInfo.type).toBe(MockedInfoType.Method);
         expect(returningMethodInfo.count).toBe(0);
         expect(sut.subject.field).toStrictEqual(expectedField);
         sut.subject.property = expectedProperty;
@@ -221,104 +224,157 @@ test('mock function should create a valid mock object with all members',
     }
 );
 
-test('invocation info should cache first property getter call',
+test('mocked property info should cache first property getter call',
     () => {
         const result = 10;
 
         const sut = mock<Test>({
-            get property() {
-                return result;
-            }
+            get property() { return result; }
         });
-        const info = sut.getInvocationInfo('property') as IPropertyInvocationInfo;
+        const info = sut.getMemberInfo('property') as IMockedPropertyInfo;
         expect(info.get!.count).toBe(0);
-        expect(info.get!.getArguments(0)).toBeNull();
-        expect(info.get!.getResult(0)).toBeNull();
+        expect(info.get!.getData(0)).toBeNull();
+
+        const start = new Date().valueOf();
         expect(sut.subject.property).toBe(result);
+        const end = new Date().valueOf();
+
         expect(info.get!.count).toBe(1);
-        expect(info.get!.getArguments(0)).toBeDefined();
-        expect(info.get!.getArguments(0)).not.toBeNull();
-        expect(info.get!.getArguments(0)!.length).toBe(0);
-        expect(info.get!.getResult(0)).toBe(result);
+        const data = info.get!.getData(0)!;
+        expect(Object.isFrozen(data)).toBe(true);
+        expect(Object.isFrozen(data.arguments)).toBe(true);
+        data.arguments.forEach((o: any) => expect(Object.isFrozen(o)).toBe(true));
+        expect(Object.isFrozen(data.result)).toBe(true);
+        expect(data).toBeDefined();
+        expect(data).not.toBeNull();
+        expect(data.no).toBe(0);
+        expect(data.globalNo).toBe(0);
+        expect(data.timestamp).toBeGreaterThanOrEqual(start);
+        expect(data.timestamp).toBeLessThanOrEqual(end);
+        expect(data.arguments).toBeDefined();
+        expect(data.arguments).not.toBeNull();
+        expect(data.arguments.length).toBe(0);
+        expect(data.result).toBe(result);
     }
 );
 
-test('invocation info should cache next property getter calls',
+test('mocked property info should cache next property getter calls',
     () => {
         const count = 5;
         const resultIncr = 10;
         let result = 0;
 
         const sut = mock<Test>({
-            get property() {
-                return (result += resultIncr);
-            }
+            get property() { return (result += resultIncr); }
         });
-        const info = sut.getInvocationInfo('property') as IPropertyInvocationInfo;
+        const info = sut.getMemberInfo('property') as IMockedPropertyInfo;
         expect(info.get!.count).toBe(0);
-        expect(info.get!.getArguments(0)).toBeNull();
-        expect(info.get!.getResult(0)).toBeNull();
+        expect(info.get!.getData(0)).toBeNull();
+
         for (let i = 1; i <= count; ++i) {
+            const start = new Date().valueOf();
             expect(sut.subject.property).toBe(resultIncr * i);
+            const end = new Date().valueOf();
+
             expect(info.get!.count).toBe(i);
-            expect(info.get!.getArguments(i - 1)!.length).toBe(0);
-            expect(info.get!.getResult(i - 1)).toBe(resultIncr * i);
+            const data = info.get!.getData(i - 1)!;
+            expect(Object.isFrozen(data)).toBe(true);
+            expect(Object.isFrozen(data.arguments)).toBe(true);
+            data.arguments.forEach((o: any) => expect(Object.isFrozen(o)).toBe(true));
+            expect(Object.isFrozen(data.result)).toBe(true);
+            expect(data).toBeDefined();
+            expect(data).not.toBeNull();
+            expect(data.no).toBe(i - 1);
+            expect(data.globalNo).toBe(i - 1);
+            expect(data.timestamp).toBeGreaterThanOrEqual(start);
+            expect(data.timestamp).toBeLessThanOrEqual(end);
+            expect(data.arguments).toBeDefined();
+            expect(data.arguments).not.toBeNull();
+            expect(data.arguments.length).toBe(0);
+            expect(data.result).toBe(resultIncr * i);
             expect(result).toBe(resultIncr * i);
         }
     }
 );
 
-test('invocation info should cache first property setter call',
+test('mocked property info should cache first property setter call',
     () => {
         const expectedResult = 10;
         let result = 0;
 
         const sut = mock<Test>({
-            set property(value: number) {
-                result = value;
-            }
+            set property(value: number) { result = value; }
         });
-        const info = sut.getInvocationInfo('property') as IPropertyInvocationInfo;
+        const info = sut.getMemberInfo('property') as IMockedPropertyInfo;
         expect(info.set!.count).toBe(0);
-        expect(info.set!.getArguments(0)).toBeNull();
-        expect(info.set!.getResult(0)).toBeNull();
+        expect(info.set!.getData(0)).toBeNull();
+
+        const start = new Date().valueOf();
         sut.subject.property = expectedResult;
+        const end = new Date().valueOf();
+
         expect(info.set!.count).toBe(1);
-        expect(info.set!.getArguments(0)).toBeDefined();
-        expect(info.set!.getArguments(0)).not.toBeNull();
-        expect(info.set!.getArguments(0)!.length).toBe(1);
-        expect(info.set!.getArguments(0)![0]).toBe(expectedResult);
+        const data = info.set!.getData(0)!;
+        expect(Object.isFrozen(data)).toBe(true);
+        expect(Object.isFrozen(data.arguments)).toBe(true);
+        data.arguments.forEach((o: any) => expect(Object.isFrozen(o)).toBe(true));
+        expect(Object.isFrozen(data.result)).toBe(true);
+        expect(data).toBeDefined();
+        expect(data).not.toBeNull();
+        expect(data.no).toBe(0);
+        expect(data.globalNo).toBe(0);
+        expect(data.timestamp).toBeGreaterThanOrEqual(start);
+        expect(data.timestamp).toBeLessThanOrEqual(end);
+        expect(data.arguments).toBeDefined();
+        expect(data.arguments).not.toBeNull();
+        expect(data.arguments.length).toBe(1);
+        expect(data.arguments[0]).toBe(expectedResult);
+        expect(data.result).not.toBeDefined();
         expect(result).toBe(expectedResult);
     }
 );
 
-test('invocation info should cache next property setter calls',
+test('mocked property info should cache next property setter calls',
     () => {
         const count = 5;
         const resultIncr = 10;
         let result = 0;
 
         const sut = mock<Test>({
-            set property(value: number) {
-                result = value;
-            }
+            set property(value: number) { result = value; }
         });
-        const info = sut.getInvocationInfo('property') as IPropertyInvocationInfo;
+        const info = sut.getMemberInfo('property') as IMockedPropertyInfo;
         expect(info.set!.count).toBe(0);
-        expect(info.set!.getArguments(0)).toBeNull();
-        expect(info.set!.getResult(0)).toBeNull();
+        expect(info.set!.getData(0)).toBeNull();
+
         for (let i = 1; i <= count; ++i) {
+            const start = new Date().valueOf();
             sut.subject.property = resultIncr * i;
+            const end = new Date().valueOf();
+
             expect(info.set!.count).toBe(i);
-            expect(info.set!.getArguments(i - 1)!.length).toBe(1);
-            expect(info.set!.getArguments(i - 1)![0]).toBe(resultIncr * i);
-            expect(info.set!.getResult(i - 1)).not.toBeDefined();
+            const data = info.set!.getData(i - 1)!;
+            expect(Object.isFrozen(data)).toBe(true);
+            expect(Object.isFrozen(data.arguments)).toBe(true);
+            data.arguments.forEach((o: any) => expect(Object.isFrozen(o)).toBe(true));
+            expect(Object.isFrozen(data.result)).toBe(true);
+            expect(data).toBeDefined();
+            expect(data).not.toBeNull();
+            expect(data.no).toBe(i - 1);
+            expect(data.globalNo).toBe(i - 1);
+            expect(data.timestamp).toBeGreaterThanOrEqual(start);
+            expect(data.timestamp).toBeLessThanOrEqual(end);
+            expect(data.arguments).toBeDefined();
+            expect(data.arguments).not.toBeNull();
+            expect(data.arguments.length).toBe(1);
+            expect(data.arguments[0]).toBe(resultIncr * i);
+            expect(data.result).not.toBeDefined();
             expect(result).toBe(resultIncr * i);
         }
     }
 );
 
-test('invocation info should cache first method call',
+test('mocked method info should cache first method call',
     () => {
         const expected1 = 10;
         const expected2 = 'foo';
@@ -329,22 +385,36 @@ test('invocation info should cache first method call',
                 return { x: a1!, y: -a1! };
             }
         });
-        const info = sut.getInvocationInfo('returningMethod') as IInvocationInfo;
+        const info = sut.getMemberInfo('returningMethod') as IMockedMethodInfo;
         expect(info.count).toBe(0);
-        expect(info.getArguments(0)).toBeNull();
-        expect(info.getResult(0)).toBeNull();
+        expect(info.getData(0)).toBeNull();
+
+        const start = new Date().valueOf();
         expect(sut.subject.returningMethod(expected1, expected2)).toStrictEqual(expectedResult);
+        const end = new Date().valueOf();
+
         expect(info.count).toBe(1);
-        expect(info.getArguments(0)).toBeDefined();
-        expect(info.getArguments(0)).not.toBeNull();
-        expect(info.getArguments(0)!.length).toBe(2);
-        expect(info.getArguments(0)![0]).toBe(expected1);
-        expect(info.getArguments(0)![1]).toBe(expected2);
-        expect(info.getResult(0)).toStrictEqual(expectedResult);
+        const data = info!.getData(0)!;
+        expect(Object.isFrozen(data)).toBe(true);
+        expect(Object.isFrozen(data.arguments)).toBe(true);
+        data.arguments.forEach((o: any) => expect(Object.isFrozen(o)).toBe(true));
+        expect(Object.isFrozen(data.result)).toBe(true);
+        expect(data).toBeDefined();
+        expect(data).not.toBeNull();
+        expect(data.no).toBe(0);
+        expect(data.globalNo).toBe(0);
+        expect(data.timestamp).toBeGreaterThanOrEqual(start);
+        expect(data.timestamp).toBeLessThanOrEqual(end);
+        expect(data.arguments).toBeDefined();
+        expect(data.arguments).not.toBeNull();
+        expect(data.arguments.length).toBe(2);
+        expect(data.arguments[0]).toBe(expected1);
+        expect(data.arguments[1]).toBe(expected2);
+        expect(data.result).toStrictEqual(expectedResult);
     }
 );
 
-test('invocation info should cache next method calls',
+test('mocked method info should cache next method calls',
     () => {
         const count = 5;
         const resultIncr = 10;
@@ -357,19 +427,67 @@ test('invocation info should cache next method calls',
                 return { x: a1!, y: -a1! };
             }
         });
-        const info = sut.getInvocationInfo('returningMethod') as IInvocationInfo;
+        const info = sut.getMemberInfo('returningMethod') as IMockedMethodInfo;
         expect(info.count).toBe(0);
-        expect(info.getArguments(0)).toBeNull();
-        expect(info.getResult(0)).toBeNull();
+        expect(info.getData(0)).toBeNull();
+
         for (let i = 1; i <= count; ++i) {
+            const start = new Date().valueOf();
             expect(sut.subject.returningMethod(expected1 * resultIncr, expected2 + String(expected1 * resultIncr)))
                 .toStrictEqual({ x: expectedResult.x * resultIncr, y: expectedResult.y * resultIncr });
-            expect(info.count).toBe(i);
-            expect(info.getArguments(i - 1)!.length).toBe(2);
-            expect(info.getArguments(i - 1)![0]).toBe(expected1 * resultIncr);
-            expect(info.getArguments(i - 1)![1]).toBe(expected2 + String(expected1 * resultIncr));
-            expect(info.getResult(i - 1)).toStrictEqual({ x: expectedResult.x * resultIncr, y: expectedResult.y * resultIncr });
+            const end = new Date().valueOf();
+
+            expect(info!.count).toBe(i);
+            const data = info!.getData(i - 1)!;
+            expect(Object.isFrozen(data)).toBe(true);
+            expect(Object.isFrozen(data.arguments)).toBe(true);
+            data.arguments.forEach((o: any) => expect(Object.isFrozen(o)).toBe(true));
+            expect(Object.isFrozen(data.result)).toBe(true);
+            expect(data).toBeDefined();
+            expect(data).not.toBeNull();
+            expect(data.no).toBe(i - 1);
+            expect(data.globalNo).toBe(i - 1);
+            expect(data.timestamp).toBeGreaterThanOrEqual(start);
+            expect(data.timestamp).toBeLessThanOrEqual(end);
+            expect(data.arguments).toBeDefined();
+            expect(data.arguments).not.toBeNull();
+            expect(data.arguments.length).toBe(2);
+            expect(data.arguments[0]).toBe(expected1 * resultIncr);
+            expect(data.arguments[1]).toBe(expected2 + String(expected1 * resultIncr));
+            expect(data.result).toStrictEqual({ x: expectedResult.x * resultIncr, y: expectedResult.y * resultIncr });
         }
+    }
+);
+
+test('data global no should increment properly',
+    () => {
+        const sut = mock<Test>({
+            set property(value: number) { return; },
+            get readonlyProperty() { return 'bar'; },
+            voidMethod(a1?: number, a2?: string, a3?: boolean, a4?: { x: number; y: number }, a5?: number[]): void {
+                return;
+            },
+            returningMethod(a1?: number, a2?: string): { x: number; y: number } {
+                return { x: 0, y: 0 };
+            }
+        });
+        sut.subject.property = 0;
+        sut.subject.voidMethod();
+        const result1 = sut.subject.readonlyProperty;
+        const result2 = sut.subject.returningMethod();
+
+        expect(result1).toBe('bar');
+        expect(result2).toStrictEqual({ x: 0, y: 0 });
+
+        const propertyInfo = sut.getMemberInfo('property')! as IMockedPropertyInfo;
+        const readonlyPropertyInfo = sut.getMemberInfo('readonlyProperty')! as IMockedPropertyInfo;
+        const voidMethodInfo = sut.getMemberInfo('voidMethod')! as IMockedMethodInfo;
+        const returningMethodInfo = sut.getMemberInfo('returningMethod')! as IMockedMethodInfo;
+
+        expect(propertyInfo.set!.getData(0)!.globalNo).toBe(0);
+        expect(readonlyPropertyInfo.get!.getData(0)!.globalNo).toBe(2);
+        expect(voidMethodInfo.getData(0)!.globalNo).toBe(1);
+        expect(returningMethodInfo.getData(0)!.globalNo).toBe(3);
     }
 );
 
@@ -382,14 +500,12 @@ test('created mock should be frozen',
     }
 );
 
-test('all invocation info should be frozen',
+test('all info should be frozen',
     () => {
-        let property = 0;
-
         const sut = mock<Test>({
             field: 'foo',
-            get property(): number { return property; },
-            set property(value: number) { property = value; },
+            get property(): number { return 0; },
+            set property(value: number) { return; },
             get readonlyProperty() { return 'bar'; },
             voidMethod(a1?: number, a2?: string, a3?: boolean, a4?: { x: number; y: number }, a5?: number[]): void {
                 return;
@@ -399,7 +515,7 @@ test('all invocation info should be frozen',
             }
         });
         for (const member of sut.mockedMembers) {
-            const info = sut.getInvocationInfo(member);
+            const info = sut.getMemberInfo(member);
             if (info) {
                 expect(Object.isFrozen(info)).toBe(true);
             }
