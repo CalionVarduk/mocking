@@ -1,6 +1,6 @@
 {
   "name": "frlluc-mocking",
-  "version": "0.9.3",
+  "version": "0.9.4",
   "description": "A simple mocking framework targetting TypeScript",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
