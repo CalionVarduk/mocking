@@ -2,7 +2,7 @@ import { MockedInfoType } from '../core/mocked-info-type.enum';
 import { IMockedMethodInfo } from '../core/mocked-method-info.interface';
 import { IMockedPropertyInfo } from '../core/mocked-property-info.interface';
 import { IMock } from '../core/mock.interface';
-import { mock, resetGlobalMockInvocationNo, getGlobalMockInvocationNo } from '../core/mock';
+import { mock, resetGlobalMockInvocationNo, getGlobalMockInvocationNo, partialMock } from '../core/mock';
 
 abstract class Test {
     public abstract field: string;
@@ -12,12 +12,21 @@ abstract class Test {
     public abstract returningMethod(a1?: number, a2?: string): { x: number; y: number };
 }
 
+class TestImpl extends Test {
+    public get property(): number { return this._property; }
+    public set property(value: number) { this._property = value; }
+    public get readonlyProperty(): string { return 'test impl'; }
+    public field: string = 'field';
+    private _property: number = 0;
+    public voidMethod(a1?: number, a2?: string, a3?: boolean, a4?: { x: number; y: number }, a5?: number[]): void { return; }
+    public returningMethod(a1?: number, a2?: string): { x: number; y: number } { return { x: a1|| 0, y: (a1 || 0) * 2 }; }
+}
+
 function assert(sut: IMock<Test>, expectedMemberCount: number): void {
     expect(sut).toBeDefined();
     expect(sut).not.toBeNull();
     expect(sut.subject).toBeDefined();
     expect(sut.subject).not.toBeNull();
-    expect(Object.getOwnPropertyNames(sut.subject).length).toBe(expectedMemberCount);
     expect(sut.mockedMembers).toBeDefined();
     expect(sut.mockedMembers).not.toBeNull();
     expect(sut.mockedMembers.length).toBe(expectedMemberCount);
@@ -504,7 +513,6 @@ test('created mock should be frozen',
     () => {
         const sut = mock<Test>({});
         expect(Object.isFrozen(sut)).toBe(true);
-        expect(Object.isFrozen(sut.subject)).toBe(true);
         expect(Object.isFrozen(sut.mockedMembers)).toBe(true);
     }
 );
@@ -529,5 +537,71 @@ test('all info should be frozen',
                 expect(Object.isFrozen(info)).toBe(true);
             }
         }
+    }
+);
+
+test('partial mock function should modify the original subject',
+    () => {
+        const subject = new TestImpl();
+        const expectedField = 'foo';
+        const expectedProperty = 10;
+        const expectedVoidMethodArgs: any[] = [7, 'faz', true, { x: 100, y: 200 }, [1, 2, 3]];
+        const expectedVoidMethodResult = void(0);
+        const expectedReturningMethodArgs: any[] = [15, 'baz'];
+        const expectedReturningMethodResult = { x: 15, y: 30 };
+        let property = -1;
+        let voidMethodArgs: any[] = [];
+        let returningMethodArgs: any[] = [];
+
+        const sut = partialMock<Test>(subject, {
+            field: expectedField,
+            get property(): number { return property; },
+            set property(value: number) { property = value; },
+            voidMethod(a1?: number, a2?: string, a3?: boolean, a4?: { x: number; y: number }, a5?: number[]): void {
+                voidMethodArgs = [a1, a2, a3, a4, a5];
+            },
+            returningMethod(a1?: number, a2?: string): { x: number; y: number } {
+                returningMethodArgs = [a1, a2];
+                return { x: a1!, y: a1! * 2 };
+            }
+        });
+        const propertyInfo = sut.getMemberInfo('property') as IMockedPropertyInfo;
+        const voidMethodInfo = sut.getMemberInfo('voidMethod') as IMockedMethodInfo;
+        const returningMethodInfo = sut.getMemberInfo('returningMethod') as IMockedMethodInfo;
+        assert(sut, 4);
+        expect(sut.subject).toBe(subject);
+        expect(sut.mockedMembers).toContain('field');
+        expect(sut.mockedMembers).toContain('property');
+        expect(sut.mockedMembers).toContain('voidMethod');
+        expect(sut.mockedMembers).toContain('returningMethod');
+        expect(sut.getMemberInfo('field')).toBeNull();
+        expect(propertyInfo).toBeDefined();
+        expect(propertyInfo).not.toBeNull();
+        expect(propertyInfo.type).toBe(MockedInfoType.Property);
+        expect(propertyInfo.get).toBeDefined();
+        expect(propertyInfo.get).not.toBeNull();
+        expect(propertyInfo.get!.type).toBe(MockedInfoType.PropertyGetter);
+        expect(propertyInfo.get!.count).toBe(0);
+        expect(propertyInfo.set).toBeDefined();
+        expect(propertyInfo.set).not.toBeNull();
+        expect(propertyInfo.set!.type).toBe(MockedInfoType.PropertySetter);
+        expect(propertyInfo.set!.count).toBe(0);
+        expect(voidMethodInfo).toBeDefined();
+        expect(voidMethodInfo).not.toBeNull();
+        expect(voidMethodInfo.type).toBe(MockedInfoType.Method);
+        expect(voidMethodInfo.count).toBe(0);
+        expect(returningMethodInfo).toBeDefined();
+        expect(returningMethodInfo).not.toBeNull();
+        expect(returningMethodInfo.type).toBe(MockedInfoType.Method);
+        expect(returningMethodInfo.count).toBe(0);
+        expect(sut.subject.field).toStrictEqual(expectedField);
+        sut.subject.property = expectedProperty;
+        expect(sut.subject.property).toBe(expectedProperty);
+        expect(property).toBe(expectedProperty);
+        expect(sut.subject.voidMethod(...expectedVoidMethodArgs)).toBe(expectedVoidMethodResult);
+        expect(voidMethodArgs).toStrictEqual(expectedVoidMethodArgs);
+        expect(sut.subject.returningMethod(...expectedReturningMethodArgs)).toStrictEqual(expectedReturningMethodResult);
+        expect(returningMethodArgs).toStrictEqual(expectedReturningMethodArgs);
+        expect(sut.subject.readonlyProperty).toBe('test impl');
     }
 );
