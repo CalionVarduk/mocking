@@ -85,6 +85,16 @@ export function mock<T>(setup: Partial<T>): IMock<T> {
  * @returns mocked object
  * */
 export function partialMock<T>(subject: T, setup: Partial<T>): IMock<T> {
+    if (subject === null || subject === void(0)) {
+        throw new Error('mock subject must be defined');
+    }
+    if (setup === null || setup === void(0)) {
+        throw new Error('mock setup must be defined');
+    }
+    if (Object.isFrozen(subject)) {
+        throw new Error('mock subject can\'t be frozen');
+    }
+
     const members: string[] = [];
     const invocationCache: { [id: string]: IMockedMethodInfo | IMockedPropertyInfo } = {};
     const result: any = {
