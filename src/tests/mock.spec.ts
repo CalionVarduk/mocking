@@ -3,6 +3,7 @@ import { IMockedMethodInfo } from '../core/mocked-method-info.interface';
 import { IMockedPropertyInfo } from '../core/mocked-property-info.interface';
 import { IMock } from '../core/mock.interface';
 import { mock, resetGlobalMockInvocationNo, getGlobalMockInvocationNo, partialMock } from '../core/mock';
+import { reinterpretCast } from '../core/reinterpret-cast';
 
 abstract class Test {
     public abstract field: string;
@@ -537,6 +538,41 @@ test('all info should be frozen',
                 expect(Object.isFrozen(info)).toBe(true);
             }
         }
+    }
+);
+
+test('partial mock function should throw when subject is null',
+    () => {
+        const action = () => partialMock(reinterpretCast<TestImpl>(null), {});
+        expect(action).toThrowError();
+    }
+);
+
+test('partial mock function should throw when subject is undefined',
+    () => {
+        const action = () => partialMock(reinterpretCast<TestImpl>(void(0)), {});
+        expect(action).toThrowError();
+    }
+);
+
+test('partial mock function should throw when setup is null',
+    () => {
+        const action = () => partialMock(new TestImpl(), reinterpretCast<Partial<TestImpl>>(null));
+        expect(action).toThrowError();
+    }
+);
+
+test('partial mock function should throw when setup is undefined',
+    () => {
+        const action = () => partialMock(new TestImpl(), reinterpretCast<Partial<TestImpl>>(void(0)));
+        expect(action).toThrowError();
+    }
+);
+
+test('partial mock function should throw when subject is frozen',
+    () => {
+        const action = () => partialMock(Object.freeze(new TestImpl()), {});
+        expect(action).toThrowError();
     }
 );
 
