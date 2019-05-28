@@ -29,7 +29,7 @@ function createFunctionMock(func: Function, subject: any, data: IInvocationData[
             globalNo: GLOBAL_INVOCATION_NO++,
             timestamp: new Date().valueOf(),
             result: Object.freeze(result),
-            arguments: Object.freeze([...arguments].map(arg => Object.freeze(arg)))
+            arguments: Object.freeze([...arguments])
         }));
         return result;
     };

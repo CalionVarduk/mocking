@@ -243,7 +243,6 @@ test('mocked property info should cache first property getter call',
         const data = info.get!.getData(0)!;
         expect(Object.isFrozen(data)).toBe(true);
         expect(Object.isFrozen(data.arguments)).toBe(true);
-        data.arguments.forEach((o: any) => expect(Object.isFrozen(o)).toBe(true));
         expect(Object.isFrozen(data.result)).toBe(true);
         expect(data).toBeDefined();
         expect(data).not.toBeNull();
@@ -280,7 +279,6 @@ test('mocked property info should cache next property getter calls',
             const data = info.get!.getData(i - 1)!;
             expect(Object.isFrozen(data)).toBe(true);
             expect(Object.isFrozen(data.arguments)).toBe(true);
-            data.arguments.forEach((o: any) => expect(Object.isFrozen(o)).toBe(true));
             expect(Object.isFrozen(data.result)).toBe(true);
             expect(data).toBeDefined();
             expect(data).not.toBeNull();
@@ -317,7 +315,6 @@ test('mocked property info should cache first property setter call',
         const data = info.set!.getData(0)!;
         expect(Object.isFrozen(data)).toBe(true);
         expect(Object.isFrozen(data.arguments)).toBe(true);
-        data.arguments.forEach((o: any) => expect(Object.isFrozen(o)).toBe(true));
         expect(Object.isFrozen(data.result)).toBe(true);
         expect(data).toBeDefined();
         expect(data).not.toBeNull();
@@ -356,7 +353,6 @@ test('mocked property info should cache next property setter calls',
             const data = info.set!.getData(i - 1)!;
             expect(Object.isFrozen(data)).toBe(true);
             expect(Object.isFrozen(data.arguments)).toBe(true);
-            data.arguments.forEach((o: any) => expect(Object.isFrozen(o)).toBe(true));
             expect(Object.isFrozen(data.result)).toBe(true);
             expect(data).toBeDefined();
             expect(data).not.toBeNull();
@@ -397,7 +393,6 @@ test('mocked method info should cache first method call',
         const data = info!.getData(0)!;
         expect(Object.isFrozen(data)).toBe(true);
         expect(Object.isFrozen(data.arguments)).toBe(true);
-        data.arguments.forEach((o: any) => expect(Object.isFrozen(o)).toBe(true));
         expect(Object.isFrozen(data.result)).toBe(true);
         expect(data).toBeDefined();
         expect(data).not.toBeNull();
@@ -441,7 +436,6 @@ test('mocked method info should cache next method calls',
             const data = info!.getData(i - 1)!;
             expect(Object.isFrozen(data)).toBe(true);
             expect(Object.isFrozen(data.arguments)).toBe(true);
-            data.arguments.forEach((o: any) => expect(Object.isFrozen(o)).toBe(true));
             expect(Object.isFrozen(data.result)).toBe(true);
             expect(data).toBeDefined();
             expect(data).not.toBeNull();
