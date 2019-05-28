@@ -3,6 +3,7 @@ import { IMockedMethodInfo } from './mocked-method-info.interface';
 import { IMockedPropertyInfo } from './mocked-property-info.interface';
 import { IInvocationData } from './invocation-data.interface';
 import { IMock } from './mock.interface';
+import { reinterpretCast } from './reinterpret-cast';
 
 let GLOBAL_INVOCATION_NO = 0;
 
@@ -74,6 +75,16 @@ function createPropertyMock(
  * @returns mocked object
  * */
 export function mock<T>(setup: Partial<T>): IMock<T> {
+    return partialMock<T>(reinterpretCast<T>({}), setup);
+}
+
+/**
+ * Allows to create a partially mocked object.
+ * @param subject an object to partially mock
+ * @param setup mock setup
+ * @returns mocked object
+ * */
+export function partialMock<T>(subject: T, setup: Partial<T>): IMock<T> {
     const members: string[] = [];
     const invocationCache: { [id: string]: IMockedMethodInfo | IMockedPropertyInfo } = {};
     const result: any = {
@@ -81,7 +92,6 @@ export function mock<T>(setup: Partial<T>): IMock<T> {
             return invocationCache[m] || null;
         }
     };
-    const subject: any = {};
     for (const key of Object.getOwnPropertyNames(setup)) {
         members.push(key);
         const descriptor = Object.getOwnPropertyDescriptor(setup, key)!;
@@ -92,12 +102,14 @@ export function mock<T>(setup: Partial<T>): IMock<T> {
                 set: propertyMock.setter
             });
         } else {
-            subject[key] = (typeof descriptor.value === 'function') ?
-                createMethodMock(invocationCache, subject, descriptor.value, key) :
-                descriptor.value;
+            Object.defineProperty(subject, key, {
+                value: (typeof descriptor.value === 'function') ?
+                    createMethodMock(invocationCache, subject, descriptor.value, key) :
+                    descriptor.value
+            });
         }
     }
-    result.subject = Object.freeze(subject);
+    result.subject = subject;
     result.mockedMembers = Object.freeze(members);
     return Object.freeze(result);
 }
