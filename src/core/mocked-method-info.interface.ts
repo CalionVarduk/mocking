@@ -1,5 +1,6 @@
 import { MockedInfoType } from './mocked-info-type.enum';
 import { IInvocationData } from './invocation-data.interface';
+import { Nullable } from 'frlluc-utils';
 
 /** Stores mocked method information. */
 export interface IMockedMethodInfo {
@@ -12,7 +13,7 @@ export interface IMockedMethodInfo {
      * @param invocationNo invocation's index
      * @returns invocation data
      * */
-    getData(invocationNo: number): IInvocationData | null;
+    getData(invocationNo: number): Nullable<IInvocationData>;
     /** Clears all stored invocation data. */
     clear(): void;
 }

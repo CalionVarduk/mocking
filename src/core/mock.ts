@@ -3,7 +3,7 @@ import { IMockedMethodInfo } from './mocked-method-info.interface';
 import { IMockedPropertyInfo } from './mocked-property-info.interface';
 import { IInvocationData } from './invocation-data.interface';
 import { IMock } from './mock.interface';
-import { reinterpretCast } from 'frlluc-utils';
+import { reinterpretCast, Nullable } from 'frlluc-utils';
 
 let GLOBAL_INVOCATION_NO = 0;
 
@@ -13,7 +13,7 @@ function createMethodInfo(type: MockedInfoType, data: IInvocationData[]): IMocke
         get count(): number {
             return data.length;
         },
-        getData(no: number): IInvocationData | null {
+        getData(no: number): Nullable<IInvocationData> {
             return data[no] || null;
         },
         clear(): void {
@@ -98,7 +98,7 @@ export function partialMock<T>(subject: T, setup: Partial<T>): IMock<T> {
     const members = new Set<string>();
     const invocationCache: { [id: string]: IMockedMethodInfo | IMockedPropertyInfo } = {};
     const result: any = {
-        getMemberInfo(m: string): IMockedMethodInfo | IMockedPropertyInfo | null {
+        getMemberInfo(m: string): Nullable<IMockedMethodInfo | IMockedPropertyInfo> {
             return invocationCache[m] || null;
         }
     };
