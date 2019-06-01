@@ -5,3 +5,4 @@ export * from './core/mocked-property-info.interface';
 export * from './core/mock.interface';
 export * from './core/mock';
 export * from './core/reinterpret-cast';
+export * from './core/dynamic-cast';

@@ -95,7 +95,7 @@ export function partialMock<T>(subject: T, setup: Partial<T>): IMock<T> {
         throw new Error('mock subject can\'t be frozen');
     }
 
-    const members: string[] = [];
+    const members = new Set<string>();
     const invocationCache: { [id: string]: IMockedMethodInfo | IMockedPropertyInfo } = {};
     const result: any = {
         getMemberInfo(m: string): IMockedMethodInfo | IMockedPropertyInfo | null {
@@ -103,7 +103,7 @@ export function partialMock<T>(subject: T, setup: Partial<T>): IMock<T> {
         }
     };
     for (const key of Object.getOwnPropertyNames(setup)) {
-        members.push(key);
+        members.add(key);
         const descriptor = Object.getOwnPropertyDescriptor(setup, key)!;
         if (descriptor.value === void(0)) {
             const propertyMock = createPropertyMock(invocationCache, subject, descriptor, key);
@@ -129,7 +129,7 @@ export function resetGlobalMockInvocationNo(): void {
     GLOBAL_INVOCATION_NO = 0;
 }
 
-/** Returns current global invocation bo counter. */
+/** Returns current global invocation no counter. */
 export function getGlobalMockInvocationNo(): number {
     return GLOBAL_INVOCATION_NO;
 }
