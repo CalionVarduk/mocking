@@ -6,7 +6,7 @@ export interface IMock<T> {
     /** Specifies the mocked object. */
     readonly subject: T;
     /** Specifies mocked subject members. */
-    readonly mockedMembers: ReadonlyArray<keyof T>;
+    readonly mockedMembers: ReadonlySet<keyof T>;
     /**
      * Returns mocked information store for a mocked method or a mocked property.
      * @param memberName subject's member name

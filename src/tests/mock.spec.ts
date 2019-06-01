@@ -30,7 +30,7 @@ function assert(sut: IMock<Test>, expectedMemberCount: number): void {
     expect(sut.subject).not.toBeNull();
     expect(sut.mockedMembers).toBeDefined();
     expect(sut.mockedMembers).not.toBeNull();
-    expect(sut.mockedMembers.length).toBe(expectedMemberCount);
+    expect(sut.mockedMembers.size).toBe(expectedMemberCount);
 }
 
 beforeEach(() => resetGlobalMockInvocationNo());
