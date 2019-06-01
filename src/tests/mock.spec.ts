@@ -3,7 +3,7 @@ import { IMockedMethodInfo } from '../core/mocked-method-info.interface';
 import { IMockedPropertyInfo } from '../core/mocked-property-info.interface';
 import { IMock } from '../core/mock.interface';
 import { mock, resetGlobalMockInvocationNo, getGlobalMockInvocationNo, partialMock } from '../core/mock';
-import { reinterpretCast } from '../core/reinterpret-cast';
+import { reinterpretCast } from 'frlluc-utils';
 
 abstract class Test {
     public abstract field: string;
