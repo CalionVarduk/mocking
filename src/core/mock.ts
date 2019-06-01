@@ -3,7 +3,7 @@ import { IMockedMethodInfo } from './mocked-method-info.interface';
 import { IMockedPropertyInfo } from './mocked-property-info.interface';
 import { IInvocationData } from './invocation-data.interface';
 import { IMock } from './mock.interface';
-import { reinterpretCast } from './reinterpret-cast';
+import { reinterpretCast } from 'frlluc-utils';
 
 let GLOBAL_INVOCATION_NO = 0;
 
