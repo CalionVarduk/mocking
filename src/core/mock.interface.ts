@@ -1,5 +1,6 @@
 import { IMockedMethodInfo } from './mocked-method-info.interface';
 import { IMockedPropertyInfo } from './mocked-property-info.interface';
+import { Nullable } from 'frlluc-utils';
 
 /** Represents a mock proxy. */
 export interface IMock<T> {
@@ -12,5 +13,5 @@ export interface IMock<T> {
      * @param memberName subject's member name
      * @returns mocked method or property information store
      * */
-    getMemberInfo(memberName: keyof T): IMockedMethodInfo | IMockedPropertyInfo | null;
+    getMemberInfo(memberName: keyof T): Nullable<IMockedMethodInfo | IMockedPropertyInfo>;
 }
