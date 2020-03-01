@@ -29,7 +29,7 @@
         "no-internal-module": true,
         "no-var-requires": true,
         "await-promise": true,
-        "curly": true,
+        "curly": false,
         "function-constructor": true,
         "label-position": true,
         "no-arg": true,

@@ -1,5 +1,6 @@
 /** Stores information for a single mocked method invocation. */
-export interface IInvocationData {
+export interface IInvocationData
+{
     /** Represents invocation's index. */
     readonly no: number;
     /** Represents invocation's global index. */
