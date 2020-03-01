@@ -3,9 +3,10 @@ import { IMockedMethodInfo } from '../core/mocked-method-info.interface';
 import { IMockedPropertyInfo } from '../core/mocked-property-info.interface';
 import { IMock } from '../core/mock.interface';
 import { mock, resetGlobalMockInvocationNo, getGlobalMockInvocationNo, partialMock } from '../core/mock';
-import { reinterpretCast } from 'frlluc-utils';
+import { reinterpretCast } from 'frl-ts-utils/lib/core/functions/reinterpret-cast';
 
-abstract class Test {
+abstract class Test
+{
     public abstract field: string;
     public abstract property: number;
     public abstract readonly readonlyProperty: string;
@@ -13,7 +14,8 @@ abstract class Test {
     public abstract returningMethod(a1?: number, a2?: string): { x: number; y: number };
 }
 
-class TestImpl extends Test {
+class TestImpl extends Test
+{
     public get property(): number { return this._property; }
     public set property(value: number) { this._property = value; }
     public get readonlyProperty(): string { return 'test impl'; }
@@ -23,7 +25,8 @@ class TestImpl extends Test {
     public returningMethod(a1?: number, a2?: string): { x: number; y: number } { return { x: a1|| 0, y: (a1 || 0) * 2 }; }
 }
 
-function assert(sut: IMock<Test>, expectedMemberCount: number): void {
+function assert(sut: IMock<Test>, expectedMemberCount: number): void
+{
     expect(sut).toBeDefined();
     expect(sut).not.toBeNull();
     expect(sut.subject).toBeDefined();
@@ -36,14 +39,16 @@ function assert(sut: IMock<Test>, expectedMemberCount: number): void {
 beforeEach(() => resetGlobalMockInvocationNo());
 
 test('mock function should create a valid mock object',
-    () => {
+    () =>
+    {
         const sut = mock<Test>({});
         assert(sut, 0);
     }
 );
 
 test('mock function should create a valid mock object with field only',
-    () => {
+    () =>
+    {
         const expected = 'foo';
 
         const sut = mock<Test>({
@@ -57,7 +62,8 @@ test('mock function should create a valid mock object with field only',
 );
 
 test('mock function should create a valid mock object with property getter only',
-    () => {
+    () =>
+    {
         const expected = 'foo';
 
         const sut = mock<Test>({
@@ -79,7 +85,8 @@ test('mock function should create a valid mock object with property getter only'
 );
 
 test('mock function should create a valid mock object with property setter only',
-    () => {
+    () =>
+    {
         const expected = 10;
         let result = -1;
 
@@ -103,7 +110,8 @@ test('mock function should create a valid mock object with property setter only'
 );
 
 test('mock function should create a valid mock object with property only',
-    () => {
+    () =>
+    {
         const expected = 10;
         let result = -1;
 
@@ -132,7 +140,8 @@ test('mock function should create a valid mock object with property only',
 );
 
 test('mock function should create a valid mock object with method only',
-    () => {
+    () =>
+    {
         const expected1 = 10;
         const expected2 = 'foo';
         const expectedResult = { x: 10, y: 20 };
@@ -140,7 +149,8 @@ test('mock function should create a valid mock object with method only',
         let result2 = '';
 
         const sut = mock<Test>({
-            returningMethod(a1?: number, a2?: string): { x: number; y: number } {
+            returningMethod(a1?: number, a2?: string): { x: number; y: number }
+            {
                 result1 = a1!;
                 result2 = a2!;
                 return { x: a1!, y: a1! * 2 };
@@ -160,7 +170,8 @@ test('mock function should create a valid mock object with method only',
 );
 
 test('mock function should create a valid mock object with all members',
-    () => {
+    () =>
+    {
         const expectedField = 'foo';
         const expectedProperty = 10;
         const expectedReadonlyProperty = 'bar';
@@ -177,10 +188,12 @@ test('mock function should create a valid mock object with all members',
             get property(): number { return property; },
             set property(value: number) { property = value; },
             get readonlyProperty() { return expectedReadonlyProperty; },
-            voidMethod(a1?: number, a2?: string, a3?: boolean, a4?: { x: number; y: number }, a5?: number[]): void {
+            voidMethod(a1?: number, a2?: string, a3?: boolean, a4?: { x: number; y: number }, a5?: number[]): void
+            {
                 voidMethodArgs = [a1, a2, a3, a4, a5];
             },
-            returningMethod(a1?: number, a2?: string): { x: number; y: number } {
+            returningMethod(a1?: number, a2?: string): { x: number; y: number }
+            {
                 returningMethodArgs = [a1, a2];
                 return { x: a1!, y: a1! * 2 };
             }
@@ -235,7 +248,8 @@ test('mock function should create a valid mock object with all members',
 );
 
 test('mocked property info should cache first property getter call',
-    () => {
+    () =>
+    {
         const result = 10;
 
         const sut = mock<Test>({
@@ -268,7 +282,8 @@ test('mocked property info should cache first property getter call',
 );
 
 test('mocked property info should cache next property getter calls',
-    () => {
+    () =>
+    {
         const count = 5;
         const resultIncr = 10;
         let result = 0;
@@ -280,7 +295,8 @@ test('mocked property info should cache next property getter calls',
         expect(info.get!.count).toBe(0);
         expect(info.get!.getData(0)).toBeNull();
 
-        for (let i = 1; i <= count; ++i) {
+        for (let i = 1; i <= count; ++i)
+        {
             const start = new Date().valueOf();
             expect(sut.subject.property).toBe(resultIncr * i);
             const end = new Date().valueOf();
@@ -306,7 +322,8 @@ test('mocked property info should cache next property getter calls',
 );
 
 test('mocked property info should cache first property setter call',
-    () => {
+    () =>
+    {
         const expectedResult = 10;
         let result = 0;
 
@@ -342,7 +359,8 @@ test('mocked property info should cache first property setter call',
 );
 
 test('mocked property info should cache next property setter calls',
-    () => {
+    () =>
+    {
         const count = 5;
         const resultIncr = 10;
         let result = 0;
@@ -354,7 +372,8 @@ test('mocked property info should cache next property setter calls',
         expect(info.set!.count).toBe(0);
         expect(info.set!.getData(0)).toBeNull();
 
-        for (let i = 1; i <= count; ++i) {
+        for (let i = 1; i <= count; ++i)
+        {
             const start = new Date().valueOf();
             sut.subject.property = resultIncr * i;
             const end = new Date().valueOf();
@@ -381,13 +400,15 @@ test('mocked property info should cache next property setter calls',
 );
 
 test('mocked method info should cache first method call',
-    () => {
+    () =>
+    {
         const expected1 = 10;
         const expected2 = 'foo';
         const expectedResult = { x: 10, y: -10 };
 
         const sut = mock<Test>({
-            returningMethod(a1?: number, a2?: string): { x: number; y: number } {
+            returningMethod(a1?: number, a2?: string): { x: number; y: number }
+            {
                 return { x: a1!, y: -a1! };
             }
         });
@@ -420,7 +441,8 @@ test('mocked method info should cache first method call',
 );
 
 test('mocked method info should cache next method calls',
-    () => {
+    () =>
+    {
         const count = 5;
         const resultIncr = 10;
         const expected1 = 10;
@@ -428,7 +450,8 @@ test('mocked method info should cache next method calls',
         const expectedResult = { x: 10, y: -10 };
 
         const sut = mock<Test>({
-            returningMethod(a1?: number, a2?: string): { x: number; y: number } {
+            returningMethod(a1?: number, a2?: string): { x: number; y: number }
+            {
                 return { x: a1!, y: -a1! };
             }
         });
@@ -436,7 +459,8 @@ test('mocked method info should cache next method calls',
         expect(info.count).toBe(0);
         expect(info.getData(0)).toBeNull();
 
-        for (let i = 1; i <= count; ++i) {
+        for (let i = 1; i <= count; ++i)
+        {
             const start = new Date().valueOf();
             expect(sut.subject.returningMethod(expected1 * resultIncr, expected2 + String(expected1 * resultIncr)))
                 .toStrictEqual({ x: expectedResult.x * resultIncr, y: expectedResult.y * resultIncr });
@@ -464,14 +488,17 @@ test('mocked method info should cache next method calls',
 );
 
 test('data global no should increment properly',
-    () => {
+    () =>
+    {
         const sut = mock<Test>({
             set property(value: number) { return; },
             get readonlyProperty() { return 'bar'; },
-            voidMethod(a1?: number, a2?: string, a3?: boolean, a4?: { x: number; y: number }, a5?: number[]): void {
+            voidMethod(a1?: number, a2?: string, a3?: boolean, a4?: { x: number; y: number }, a5?: number[]): void
+            {
                 return;
             },
-            returningMethod(a1?: number, a2?: string): { x: number; y: number } {
+            returningMethod(a1?: number, a2?: string): { x: number; y: number }
+            {
                 return { x: 0, y: 0 };
             }
         });
@@ -497,7 +524,8 @@ test('data global no should increment properly',
 );
 
 test('mocked method info clear should remove all invocation data',
-    () => {
+    () =>
+    {
         const sut = mock<Test>({
             set property(value: number) { return; }
         });
@@ -511,7 +539,8 @@ test('mocked method info clear should remove all invocation data',
 );
 
 test('created mock should be frozen',
-    () => {
+    () =>
+    {
         const sut = mock<Test>({});
         expect(Object.isFrozen(sut)).toBe(true);
         expect(Object.isFrozen(sut.mockedMembers)).toBe(true);
@@ -519,65 +548,74 @@ test('created mock should be frozen',
 );
 
 test('all info should be frozen',
-    () => {
+    () =>
+    {
         const sut = mock<Test>({
             field: 'foo',
             get property(): number { return 0; },
             set property(value: number) { return; },
             get readonlyProperty() { return 'bar'; },
-            voidMethod(a1?: number, a2?: string, a3?: boolean, a4?: { x: number; y: number }, a5?: number[]): void {
+            voidMethod(a1?: number, a2?: string, a3?: boolean, a4?: { x: number; y: number }, a5?: number[]): void
+            {
                 return;
             },
-            returningMethod(a1?: number, a2?: string): { x: number; y: number } {
+            returningMethod(a1?: number, a2?: string): { x: number; y: number }
+            {
                 return { x: 0, y: 0 };
             }
         });
-        for (const member of sut.mockedMembers) {
+        for (const member of sut.mockedMembers)
+        {
             const info = sut.getMemberInfo(member);
-            if (info) {
+            if (info)
                 expect(Object.isFrozen(info)).toBe(true);
-            }
         }
     }
 );
 
 test('partial mock function should throw when subject is null',
-    () => {
+    () =>
+    {
         const action = () => partialMock(reinterpretCast<TestImpl>(null), {});
         expect(action).toThrowError();
     }
 );
 
 test('partial mock function should throw when subject is undefined',
-    () => {
+    () =>
+    {
         const action = () => partialMock(reinterpretCast<TestImpl>(void(0)), {});
         expect(action).toThrowError();
     }
 );
 
 test('partial mock function should throw when setup is null',
-    () => {
+    () =>
+    {
         const action = () => partialMock(new TestImpl(), reinterpretCast<Partial<TestImpl>>(null));
         expect(action).toThrowError();
     }
 );
 
 test('partial mock function should throw when setup is undefined',
-    () => {
+    () =>
+    {
         const action = () => partialMock(new TestImpl(), reinterpretCast<Partial<TestImpl>>(void(0)));
         expect(action).toThrowError();
     }
 );
 
 test('partial mock function should throw when subject is frozen',
-    () => {
+    () =>
+    {
         const action = () => partialMock(Object.freeze(new TestImpl()), {});
         expect(action).toThrowError();
     }
 );
 
 test('partial mock function should modify the original subject',
-    () => {
+    () =>
+    {
         const subject = new TestImpl();
         const expectedField = 'foo';
         const expectedProperty = 10;
@@ -593,10 +631,12 @@ test('partial mock function should modify the original subject',
             field: expectedField,
             get property(): number { return property; },
             set property(value: number) { property = value; },
-            voidMethod(a1?: number, a2?: string, a3?: boolean, a4?: { x: number; y: number }, a5?: number[]): void {
+            voidMethod(a1?: number, a2?: string, a3?: boolean, a4?: { x: number; y: number }, a5?: number[]): void
+            {
                 voidMethodArgs = [a1, a2, a3, a4, a5];
             },
-            returningMethod(a1?: number, a2?: string): { x: number; y: number } {
+            returningMethod(a1?: number, a2?: string): { x: number; y: number }
+            {
                 returningMethodArgs = [a1, a2];
                 return { x: a1!, y: a1! * 2 };
             }
