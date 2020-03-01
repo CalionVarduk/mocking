@@ -15,7 +15,7 @@ If you are using `npm`, then simply run the `npm install frl-ts-mocking` CLI com
 
 If you are using `yarn`, then go with the `yarn add frl-ts-mocking` command.
 
-## B. The [mock\<T\>](https://github.com/CalionVarduk/ts-mocking/blob/master/src/core/mock.ts#L77) function
+## B. The [mock\<T\>](https://github.com/CalionVarduk/ts-mocking/blob/master/src/core/mock.ts#L94) function
 
 This function is the bread and butter of this project. As the name suggests, it allows you to create a mocked object.
 
@@ -163,7 +163,7 @@ const propertySetInvocation = propertySetInfo.getData(0);
 
 And there we have it.
 
-## G. The [partialMock\<T\>](https://github.com/CalionVarduk/ts-mocking/blob/master/src/core/mock.ts#L87) function
+## G. The [partialMock\<T\>](https://github.com/CalionVarduk/ts-mocking/blob/master/src/core/mock.ts#L105) function
 
 This function is very similar to the `mock<T>` function. The difference between these two is that the `partialMock<T>` allows you to modify an already existing object of type `T` and treat it as the mock subject, unlike the `mock<T>`, which creates the subject from scratch.
 
@@ -215,6 +215,6 @@ const barMock = partialMock<T>(bar, {
 
 There are a few additional functions that don't really belong to any category. These are:
 
-- [resetGlobalMockInvocationNo](https://github.com/CalionVarduk/ts-mocking/blob/master/src/core/mock.ts#L128) - allows to reset the `IInvocationData.globalNo` generator to `0`. This may for example be called before each test.
+- [resetGlobalMockInvocationNo](https://github.com/CalionVarduk/ts-mocking/blob/master/src/core/mock.ts#L148) - allows to reset the `IInvocationData.globalNo` generator to `0`. This may for example be called before each test.
 
-- [getGlobalMockInvocationNo](https://github.com/CalionVarduk/ts-mocking/blob/master/src/core/mock.ts#L133) - allows to lookup the next value for `IInvocationData.globalNo`.
+- [getGlobalMockInvocationNo](https://github.com/CalionVarduk/ts-mocking/blob/master/src/core/mock.ts#L154) - allows to lookup the next value for `IInvocationData.globalNo`.
