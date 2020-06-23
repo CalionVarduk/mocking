@@ -1,6 +1,6 @@
 import { IMockedMethodInfo } from './mocked-method-info.interface';
 import { IMockedPropertyInfo } from './mocked-property-info.interface';
-import { Nullable } from 'frl-ts-utils/lib/core/nullable';
+import { Nullable } from 'frl-ts-utils/lib/types/nullable';
 
 /** Represents a mock proxy. */
 export interface IMock<T>
