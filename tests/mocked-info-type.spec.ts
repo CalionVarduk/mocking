@@ -1,4 +1,4 @@
-import { MockedInfoType } from '../core/mocked-info-type.enum';
+import { MockedInfoType } from '../src/mocked-info-type.enum';
 
 test('mocked info type uniqueness',
     () =>

@@ -15,7 +15,7 @@ If you are using `npm`, then simply run the `npm install frl-ts-mocking` CLI com
 
 If you are using `yarn`, then go with the `yarn add frl-ts-mocking` command.
 
-## B. The [mock\<T\>](https://github.com/CalionVarduk/ts-mocking/blob/master/src/core/mock.ts#L94) function
+## B. The [mock\<T\>](https://github.com/CalionVarduk/ts-mocking/blob/master/src/mock.ts#L94) function
 
 This function is the bread and butter of this project. As the name suggests, it allows you to create a mocked object.
 
@@ -53,7 +53,7 @@ const fooMock = mock<Foo>({
 
 That's it!
 
-## C. The [IMock\<T\>](https://github.com/CalionVarduk/ts-mocking/blob/master/src/core/mock.interface.ts) interface
+## C. The [IMock\<T\>](https://github.com/CalionVarduk/ts-mocking/blob/master/src/mock.interface.ts) interface
 
 Now, the `fooMock` object implements an `IMock<T>` interface, which contains some interesting members:
 
@@ -75,7 +75,7 @@ Now, the `fooMock` object implements an `IMock<T>` interface, which contains som
 **NOTE:**<br/>
 Be careful about using `instanceof` on `IMock<T>.subject`, e.g. `fooMock.subject instanceof Foo` will return `false`. The `mock` function doesn't actually create objects of type `T`. An exception to that rule are `IMock`s returned by the `partialMock` function, but more on that later in section `G`.
 
-## D. The [IMockedPropertyInfo](https://github.com/CalionVarduk/ts-mocking/blob/master/src/core/mocked-property-info.interface.ts) interface
+## D. The [IMockedPropertyInfo](https://github.com/CalionVarduk/ts-mocking/blob/master/src/mocked-property-info.interface.ts) interface
 
 Calling the `getMemberInfo` method on our `fooMock` object with the `'property'` argument will return an invocation metadata object that implements the `IMockedPropertyInfo` interface.
 
@@ -85,13 +85,13 @@ const propertyInfo = fooMock.getMemberInfo('property') as IMockedPropertyInfo;
 
 This interface has 3 members:
 
-- `type` - specifies the invocation metadata type. For properties, it is always equal to `MockedInfoType.Property`. [MockedInfoType](https://github.com/CalionVarduk/ts-mocking/blob/master/src/core/mocked-info-type.enum.ts) is a simple enum that contains all possible invocation metadata types.
+- `type` - specifies the invocation metadata type. For properties, it is always equal to `MockedInfoType.Property`. [MockedInfoType](https://github.com/CalionVarduk/ts-mocking/blob/master/src/mocked-info-type.enum.ts) is a simple enum that contains all possible invocation metadata types.
 
 - `get` - returns the property's getter invocation metadata, if the getter has been mocked. Otherwise, it will return `null`.
 
 - `set` - returns the property's setter invocation metadata, if the setter has been mocked. Otherwise, it will return `null`.
 
-## E. The [IMockedMethodInfo](https://github.com/CalionVarduk/ts-mocking/blob/master/src/core/mocked-method-info.interface.ts) interface
+## E. The [IMockedMethodInfo](https://github.com/CalionVarduk/ts-mocking/blob/master/src/mocked-method-info.interface.ts) interface
 
 The `IMockedMethodInfo` represents single method's invocation metadata. Objects, that implement this interface, can be accessed by calling the `getMemberInfo` with an argument, that specifies a method's name, or by calling the `get` and `set` properties of the `IMockedPropertyInfo` objects.
 
@@ -111,7 +111,7 @@ This interface has 4 members:
 
 - `clear` - clears all invocation data for this method and resets the counter.
 
-## F. The [IInvocationData](https://github.com/CalionVarduk/ts-mocking/blob/master/src/core/invocation-data.interface.ts) interface
+## F. The [IInvocationData](https://github.com/CalionVarduk/ts-mocking/blob/master/src/invocation-data.interface.ts) interface
 
 The `IInvocationData` contains single invocation's properties, like:
 
@@ -163,7 +163,7 @@ const propertySetInvocation = propertySetInfo.getData(0);
 
 And there we have it.
 
-## G. The [partialMock\<T\>](https://github.com/CalionVarduk/ts-mocking/blob/master/src/core/mock.ts#L105) function
+## G. The [partialMock\<T\>](https://github.com/CalionVarduk/ts-mocking/blob/master/src/mock.ts#L105) function
 
 This function is very similar to the `mock<T>` function. The difference between these two is that the `partialMock<T>` allows you to modify an already existing object of type `T` and treat it as the mock subject, unlike the `mock<T>`, which creates the subject from scratch.
 
@@ -215,6 +215,6 @@ const barMock = partialMock<T>(bar, {
 
 There are a few additional functions that don't really belong to any category. These are:
 
-- [resetGlobalMockInvocationNo](https://github.com/CalionVarduk/ts-mocking/blob/master/src/core/mock.ts#L148) - allows to reset the `IInvocationData.globalNo` generator to `0`. This may for example be called before each test.
+- [resetGlobalMockInvocationNo](https://github.com/CalionVarduk/ts-mocking/blob/master/src/mock.ts#L148) - allows to reset the `IInvocationData.globalNo` generator to `0`. This may for example be called before each test.
 
-- [getGlobalMockInvocationNo](https://github.com/CalionVarduk/ts-mocking/blob/master/src/core/mock.ts#L154) - allows to lookup the next value for `IInvocationData.globalNo`.
+- [getGlobalMockInvocationNo](https://github.com/CalionVarduk/ts-mocking/blob/master/src/mock.ts#L154) - allows to lookup the next value for `IInvocationData.globalNo`.
