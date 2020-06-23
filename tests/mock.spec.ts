@@ -1,9 +1,9 @@
-import { MockedInfoType } from '../core/mocked-info-type.enum';
-import { IMockedMethodInfo } from '../core/mocked-method-info.interface';
-import { IMockedPropertyInfo } from '../core/mocked-property-info.interface';
-import { IMock } from '../core/mock.interface';
-import { mock, resetGlobalMockInvocationNo, getGlobalMockInvocationNo, partialMock } from '../core/mock';
-import { reinterpretCast } from 'frl-ts-utils/lib/core/functions/reinterpret-cast';
+import { MockedInfoType } from '../src/mocked-info-type.enum';
+import { IMockedMethodInfo } from '../src/mocked-method-info.interface';
+import { IMockedPropertyInfo } from '../src/mocked-property-info.interface';
+import { IMock } from '../src/mock.interface';
+import { mock, resetGlobalMockInvocationNo, getGlobalMockInvocationNo, partialMock } from '../src/mock';
+import { reinterpretCast } from 'frl-ts-utils/lib/functions/reinterpret-cast';
 
 abstract class Test
 {

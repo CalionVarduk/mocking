@@ -3,11 +3,11 @@ import { IMockedMethodInfo } from './mocked-method-info.interface';
 import { IMockedPropertyInfo } from './mocked-property-info.interface';
 import { IInvocationData } from './invocation-data.interface';
 import { IMock } from './mock.interface';
-import { Nullable } from 'frl-ts-utils/lib/core/nullable';
-import { reinterpretCast } from 'frl-ts-utils/lib/core/functions/reinterpret-cast';
-import { isUndefined } from 'frl-ts-utils/lib/core/functions/is-undefined';
-import { isPrimitiveOfType } from 'frl-ts-utils/lib/core/functions/primitive-cast';
-import { Assert } from 'frl-ts-utils/lib/core/functions/assert';
+import { Nullable } from 'frl-ts-utils/lib/types/nullable';
+import { reinterpretCast } from 'frl-ts-utils/lib/functions/reinterpret-cast';
+import { isUndefined } from 'frl-ts-utils/lib/functions/is-undefined';
+import { isPrimitiveOfType } from 'frl-ts-utils/lib/functions/primitive-cast';
+import { Assert } from 'frl-ts-utils/lib/functions/assert';
 
 let GLOBAL_INVOCATION_NO = 0;
 

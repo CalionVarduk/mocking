@@ -1,6 +1,6 @@
 import { MockedInfoType } from './mocked-info-type.enum';
 import { IMockedMethodInfo } from './mocked-method-info.interface';
-import { Nullable } from 'frl-ts-utils/lib/core/types/nullable';
+import { Nullable } from 'frl-ts-utils/lib/types/nullable';
 
 /** Stores mocked property information. */
 export interface IMockedPropertyInfo
