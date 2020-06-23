@@ -1,6 +1,6 @@
 {
   "name": "frl-ts-mocking",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "A simple mocking framework targetting TypeScript",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
